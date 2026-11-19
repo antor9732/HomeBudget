@@ -1,0 +1,9 @@
+<resources>
+    <style name="Theme.HomeBudget" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">@color/bg</item>
+    </style>
+    <color name="bg">#FFF8F6F1</color>
+    <color name="brand">#FF1B5E52</color>
+    <color name="bg_dark">#FF121614</color>
+</resources>
