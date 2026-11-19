@@ -25,13 +25,25 @@ android {
         applicationId = "com.webcartisan.homebudget"
         minSdk = 26
         targetSdk = 35
-        versionCode = 6
-        versionName = "1.3.1"
+        versionCode = 7
+        versionName = "1.3.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$webClientId\"")
     }
 
     signingConfigs {
+        // Release key lives outside the repository. local.properties:
+        //   homebudget.releaseStore=/path/homebudget-release.jks
+        //   homebudget.releaseStorePassword=...   homebudget.releaseKeyAlias=homebudget
+        val releaseStore = localProps.getProperty("homebudget.releaseStore")
+        if (releaseStore != null && file(releaseStore).exists()) {
+            create("release") {
+                storeFile = file(releaseStore)
+                storePassword = localProps.getProperty("homebudget.releaseStorePassword")
+                keyAlias = localProps.getProperty("homebudget.releaseKeyAlias") ?: "homebudget"
+                keyPassword = localProps.getProperty("homebudget.releaseKeyPassword") ?: storePassword
+            }
+        }
         getByName("debug") {
             // The maintainer's keystore (not published) keeps the SHA-1 registered in Google Cloud
             // stable. Without it, Gradle's default debug key is used; register its SHA-1 in your
@@ -48,9 +60,12 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
+            // Not debuggable. Code shrinking stays off until R8 rules are verified on real devices.
+            isDebuggable = false
+            isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.findByName("release")
         }
     }
     compileOptions {
