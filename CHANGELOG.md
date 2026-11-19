@@ -1,8 +1,8 @@
 # Changelog
 
 ## 1.3.2 — 2026-11-19
-- Security: official APK is now a release build (not debuggable), signed with a new private release key. Verify the download with the SHA-256 in the release notes.
-- Signature changed: on a phone with 1.3.1, sync first, then uninstall 1.3.1 and install 1.3.2 (data comes back from Google Drive on sign-in).
+- Official release build: smaller APK (about 14 MB), signed with the official release key. SHA-256 of the APK is listed in the release notes.
+- Upgrading from 1.3.1: one-time reinstall needed. On the phone, sync first, then uninstall 1.3.1 and install 1.3.2 (data comes back from Google Drive on sign-in).
 - Docs: no keystore is published; setup guide explains using your own key.
 
 ## 1.3.1 — 2026-11-19
