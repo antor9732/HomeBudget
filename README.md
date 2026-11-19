@@ -15,9 +15,13 @@ HomeBudget একটা Android অ্যাপ। এতে সংসারে�
 
 **[সর্বশেষ APK ডাউনলোড করুন (Releases)](https://github.com/antor9732/HomeBudget/releases/latest)**: `HomeBudget-x.y.z.apk` ফাইলটা নামান।
 
-একই পেজে দুটো বাংলা ভিডিও আছে:
+দুটো বাংলা ভিডিও আছে **[v1.3.1 Release পেজে](https://github.com/antor9732/HomeBudget/releases/tag/v1.3.1)** (অ্যাপের ব্যবহার একই):
 - `HomeBudget-invite-join.mp4`: সদস্য যোগ করা আর Join করা (১ মিনিট ২২ সেকেন্ড)
 - `HomeBudget-tutorial.mp4`: পুরো অ্যাপের পরিচিতি (২ মিনিট)
+
+> 🔒 **নিরাপত্তা:** APK শুধু এই GitHub Releases পেজ থেকেই নামান। Release notes-এ দেওয়া **SHA-256** মিলিয়ে নিতে পারেন (Windows: `certutil -hashfile HomeBudget-1.3.2.apk SHA256`)।
+>
+> ⚠️ **আগে 1.3.1 বা তার আগের ভার্সন থাকলে:** 1.3.2 নতুন সাইনিং কী দিয়ে বানানো, তাই সরাসরি আপডেট হবে না। আগে অ্যাপে **Sync now** দিন, তারপর পুরনো অ্যাপ Uninstall করে 1.3.2 ইনস্টল করুন এবং একই Gmail দিয়ে **Continue with Google** দিন — সংসারের ডেটা Drive থেকে ফিরে আসবে।
 
 > প্রয়োজন: Android 8.0 বা তার পরের ভার্সন, আর একটা Gmail অ্যাকাউন্ট (শেয়ার করতে চাইলে)।
 
