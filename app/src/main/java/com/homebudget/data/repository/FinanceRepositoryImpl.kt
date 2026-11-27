@@ -82,7 +82,7 @@ class FinanceRepositoryImpl @Inject constructor(
         if (items.isNotEmpty()) db.transactionItems().insertAll(items)
     }
 
-    override suspend fun addTransaction(draft: TransactionDraft): String {
+    override suspend fun addTransaction(draft: TransactionDraft, fixedId: String?): String {
         val ctx = ctx()
         if (!ctx.canEditTransactions) throw PermissionDeniedException("Your role cannot add transactions")
         validate(ctx, draft)
@@ -91,7 +91,7 @@ class FinanceRepositoryImpl @Inject constructor(
         val now = now()
         val opId = Ids.random()
         val e = TransactionEntity(
-            id = Ids.random(), householdId = ctx.householdId, categoryId = draft.categoryId, type = draft.type,
+            id = fixedId ?: Ids.random(), householdId = ctx.householdId, categoryId = draft.categoryId, type = draft.type,
             title = draft.title.trim(), amountMinor = draft.amountMinor, currencyCode = ctx.household.currencyCode,
             transactionDate = draft.date.toEpochDay(), description = draft.description?.trim()?.ifBlank { null },
             createdBy = ctx.member.id, deviceId = identity.deviceId(), createdAt = now, updatedAt = now,
