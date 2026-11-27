@@ -15,3 +15,8 @@
 | D-10 | UI strings English, inline in Compose | English first; extracting to `strings.xml` for Bengali is a follow-up |
 | D-11 | Exact-time reminders not used; daily reminder via WorkManager periodic work | Plan: AlarmManager only if exact time is required |
 | D-12 | Bottom tab "Transactions" labelled "History" | Label did not fit 5-tab bar on 411dp phones |
+
+## D-05 Shared bazar lists (27 Nov 2026)
+- Lists and items are separate synced entities (SHOPPING_LIST, SHOPPING_ITEM) so one phone can add items while another ticks them. Concurrent edits to the same item resolve silently (newer revision wins); no conflict is shown in Sync center.
+- "Finish" creates one itemized EXPENSE per category with id `nameUUID(bazar-expense:<list>:<category>)`, so finishing twice (or on two phones) converges on one transaction.
+- Owner/Admin/Member may edit any list; Viewer is read-only. Older app versions mark these operations as rejected; the v3 migration forgets rejected operations so they are applied after the update.
