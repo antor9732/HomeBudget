@@ -7,6 +7,13 @@ import com.homebudget.core.database.MemberEntity
 import com.homebudget.core.database.OpeningBalanceEntity
 import com.homebudget.core.database.TransactionEntity
 import com.homebudget.core.database.TransactionItemEntity
+import com.homebudget.core.database.ShoppingItemEntity
+import com.homebudget.core.database.ShoppingListEntity
+import com.homebudget.data.remote.ShoppingItemDto
+import com.homebudget.data.remote.ShoppingListDto
+import com.homebudget.domain.model.ShoppingItem
+import com.homebudget.domain.model.ShoppingList
+import com.homebudget.domain.model.ShoppingStatus
 import com.homebudget.data.remote.TransactionItemDto
 import com.homebudget.domain.model.TransactionItem
 import com.homebudget.data.remote.BudgetDto
@@ -72,3 +79,11 @@ fun TransactionDto.toEntity(opId: String) = TransactionEntity(
     id, householdId, categoryId, TransactionType.valueOf(type), title, amountMinor, currencyCode, transactionDate,
     description, createdBy, deviceId, createdAt, updatedAt, revision, opId, isDeleted,
 )
+
+// ---- Bazar lists
+fun ShoppingListEntity.toDto() = ShoppingListDto(id, householdId, title, status.name, createdBy, createdAt, updatedAt, completedAt, revision, isDeleted)
+fun ShoppingListDto.toEntity(opId: String) = ShoppingListEntity(id, householdId, title, ShoppingStatus.valueOf(status), createdBy, createdAt, updatedAt, completedAt, revision, opId, isDeleted)
+fun ShoppingItemEntity.toDto() = ShoppingItemDto(id, householdId, listId, name, quantity, categoryId, position, isChecked, priceMinor, checkedBy, updatedAt, revision, isDeleted)
+fun ShoppingItemDto.toEntity(opId: String) = ShoppingItemEntity(id, householdId, listId, name, quantity, categoryId, position, isChecked, priceMinor, checkedBy, updatedAt, revision, opId, isDeleted)
+fun ShoppingItemEntity.toDomain() = ShoppingItem(id, listId, name, quantity, categoryId, position, isChecked, priceMinor, checkedBy)
+fun ShoppingListEntity.toDomain(items: List<ShoppingItem>) = ShoppingList(id, householdId, title, status, createdBy, createdAt, updatedAt, completedAt, items)
