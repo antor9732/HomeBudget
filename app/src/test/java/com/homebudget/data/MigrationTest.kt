@@ -39,6 +39,21 @@ class MigrationTest {
     }
 
     @Test
+    fun migrate2To3AddsBazarTablesAndForgetsRejectedOps() {
+        helper.createDatabase(name, 2).apply {
+            execSQL("INSERT INTO households (id,name,ownerMemberId,currencyCode,driveFolderId,createdAt,updatedAt,revision,lastOperationId,isDeleted) VALUES ('h','Home','m','BDT',NULL,1,1,1,'o',0)")
+            execSQL("INSERT INTO applied_operations (operationId,householdId,source,entityId,baseOperationId,driveFileId,appliedAt) VALUES ('r1','h','REJECTED','',NULL,'f',1)")
+            execSQL("INSERT INTO applied_operations (operationId,householdId,source,entityId,baseOperationId,driveFileId,appliedAt) VALUES ('ok1','h','REMOTE','x',NULL,'f',1)")
+            close()
+        }
+        val db = helper.runMigrationsAndValidate(name, 3, true, AppDatabase.MIGRATION_2_3)
+        db.query("SELECT operationId FROM applied_operations").use { c -> assertEquals(1, c.count); c.moveToFirst(); assertEquals("ok1", c.getString(0)) }
+        db.execSQL("INSERT INTO shopping_lists (id,householdId,title,status,createdBy,createdAt,updatedAt,completedAt,revision,lastOperationId,isDeleted) VALUES ('l','h','Bazar','OPEN','m',1,1,NULL,1,'o',0)")
+        db.execSQL("INSERT INTO shopping_items (id,householdId,listId,name,quantity,categoryId,position,isChecked,priceMinor,checkedBy,updatedAt,revision,lastOperationId,isDeleted) VALUES ('i','h','l','Rice','5 kg','c',0,1,45000,'m',1,1,'o',0)")
+        db.close()
+    }
+
+    @Test
     fun exportedSchemaMatchesEntitiesAndOpensWithMigrations() {
         helper.createDatabase("fresh-$name", 1).close()
         val db = Room.databaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java, "fresh-$name")
