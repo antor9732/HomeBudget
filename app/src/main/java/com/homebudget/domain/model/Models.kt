@@ -97,3 +97,35 @@ data class SyncStatus(
     val lastError: String?,
     val openConflicts: Int,
 )
+
+enum class ShoppingStatus { OPEN, DONE }
+
+data class ShoppingItem(
+    val id: String,
+    val listId: String,
+    val name: String,
+    val quantity: String?,
+    val categoryId: String,
+    val position: Int,
+    val isChecked: Boolean,
+    val priceMinor: Long?,
+    val checkedBy: String?,
+)
+
+data class ShoppingList(
+    val id: String,
+    val householdId: String,
+    val title: String,
+    val status: ShoppingStatus,
+    val createdBy: String,
+    val createdAt: Long,
+    val updatedAt: Long,
+    val completedAt: Long?,
+    val items: List<ShoppingItem> = emptyList(),
+) {
+    val boughtCount get() = items.count { it.isChecked }
+    val boughtTotalMinor get() = items.filter { it.isChecked }.sumOf { it.priceMinor ?: 0L }
+}
+
+/** What "Finish bazar" did. */
+data class ShoppingFinishResult(val expenses: Int, val totalMinor: Long, val carriedOver: Int, val newListId: String?)

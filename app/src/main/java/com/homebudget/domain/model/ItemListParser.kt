@@ -28,6 +28,9 @@ object ItemListParser {
         return Result(items, invalid)
     }
 
+    /** Converts Bangla digits (০-৯) to ASCII digits. */
+    fun normalizeDigits(s: String): String = s.map { bnDigits[it] ?: it }.joinToString("")
+
     const val MAX_NAME = 60
     const val MAX_ITEMS = 200
 }
