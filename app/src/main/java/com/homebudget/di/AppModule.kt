@@ -17,6 +17,8 @@ import com.homebudget.core.security.DeviceKeyWrapper
 import com.homebudget.core.sync.ChangeListener
 import com.homebudget.core.sync.SyncRepositoryImpl
 import com.homebudget.data.repository.FinanceRepositoryImpl
+import com.homebudget.data.repository.ShoppingRepositoryImpl
+import com.homebudget.domain.repository.ShoppingRepository
 import com.homebudget.data.repository.HouseholdRepositoryImpl
 import com.homebudget.domain.repository.FinanceRepository
 import com.homebudget.domain.repository.HouseholdRepository
@@ -59,5 +61,6 @@ abstract class BindsModule {
     @Binds abstract fun changeListener(impl: WorkScheduler): ChangeListener
     @Binds abstract fun households(impl: HouseholdRepositoryImpl): HouseholdRepository
     @Binds abstract fun finance(impl: FinanceRepositoryImpl): FinanceRepository
+    @Binds abstract fun shopping(impl: ShoppingRepositoryImpl): ShoppingRepository
     @Binds abstract fun sync(impl: SyncRepositoryImpl): SyncRepository
 }
