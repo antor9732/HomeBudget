@@ -74,7 +74,7 @@ class UiSmokeTest {
         rule.waitForIdle()
 
         val tabs = listOf(
-            Triple("History", "06_transactions", "2 items"), Triple("Categories", "07_categories", "House Rent"),
+            Triple("History", "06_transactions", "2 items"), Triple("Bazar", "07_bazar", "New bazar list"),
             Triple("Reports", "08_reports", "Totals"), Triple("Settings", "09_settings", "Account & sync"),
         )
         for ((tab, name, marker) in tabs) {
