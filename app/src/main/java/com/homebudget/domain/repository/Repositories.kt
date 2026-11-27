@@ -8,6 +8,8 @@ import com.homebudget.domain.model.Member
 import com.homebudget.domain.model.MonthTotals
 import com.homebudget.domain.model.OpeningBalance
 import com.homebudget.domain.model.Role
+import com.homebudget.domain.model.ShoppingFinishResult
+import com.homebudget.domain.model.ShoppingList
 import com.homebudget.domain.model.SyncStatus
 import com.homebudget.domain.model.Transaction
 import com.homebudget.domain.model.TransactionDraft
@@ -48,7 +50,8 @@ interface HouseholdRepository {
 
 interface FinanceRepository {
     // Transactions
-    suspend fun addTransaction(draft: TransactionDraft): String
+    /** @param fixedId a deterministic id (e.g. a bazar expense); null for a new random id. */
+    suspend fun addTransaction(draft: TransactionDraft, fixedId: String? = null): String
     suspend fun updateTransaction(id: String, draft: TransactionDraft)
     suspend fun deleteTransaction(id: String)
     fun observeTransaction(id: String): Flow<Transaction?>
@@ -74,6 +77,25 @@ interface FinanceRepository {
     suspend fun monthTotals(householdId: String, month: YearMonth): Pair<Long, Long>
     fun observeCategoryTotals(householdId: String, type: TransactionType, from: YearMonth, to: YearMonth): Flow<List<CategoryTotal>>
     fun observeMonthlySeries(householdId: String, from: YearMonth, to: YearMonth): Flow<List<MonthTotals>>
+}
+
+/** Shared bazar (shopping) lists: tick items with their price, then turn them into expenses per category. */
+interface ShoppingRepository {
+    fun observeLists(householdId: String): Flow<List<ShoppingList>>
+    fun observeList(listId: String): Flow<ShoppingList?>
+    suspend fun createList(title: String): String
+    suspend fun renameList(listId: String, title: String)
+    suspend fun deleteList(listId: String)
+    suspend fun addItem(listId: String, name: String, quantity: String?, categoryId: String?): String
+    suspend fun updateItem(itemId: String, name: String, quantity: String?, categoryId: String)
+    /** Ticks an item as bought with its price (null keeps the price empty), or unticks it. */
+    suspend fun setBought(itemId: String, bought: Boolean, priceMinor: Long?)
+    suspend fun deleteItem(itemId: String)
+    /**
+     * Adds one itemized expense per category for the ticked items, marks the list done and, if
+     * [carryOver], moves unticked items to a new list.
+     */
+    suspend fun finish(listId: String, carryOver: Boolean): ShoppingFinishResult
 }
 
 interface SyncRepository {
