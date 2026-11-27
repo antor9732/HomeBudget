@@ -268,3 +268,36 @@ interface ConflictDao {
     @Query("UPDATE conflicts SET resolutionStatus = :status, resolvedAt = :at WHERE id = :id")
     suspend fun resolve(id: String, status: ConflictResolution, at: Long)
 }
+
+@Dao
+interface ShoppingDao {
+    @Query("SELECT * FROM shopping_lists WHERE id = :id")
+    suspend fun getList(id: String): ShoppingListEntity?
+
+    @Query("SELECT * FROM shopping_lists WHERE id = :id")
+    fun observeList(id: String): Flow<ShoppingListEntity?>
+
+    @Query("SELECT * FROM shopping_lists WHERE householdId = :hh AND isDeleted = 0 ORDER BY status DESC, updatedAt DESC")
+    fun observeLists(hh: String): Flow<List<ShoppingListEntity>>
+
+    @Upsert
+    suspend fun upsertList(e: ShoppingListEntity)
+
+    @Query("SELECT * FROM shopping_items WHERE id = :id")
+    suspend fun getItem(id: String): ShoppingItemEntity?
+
+    @Query("SELECT * FROM shopping_items WHERE listId = :listId AND isDeleted = 0 ORDER BY position, updatedAt")
+    suspend fun items(listId: String): List<ShoppingItemEntity>
+
+    @Query("SELECT * FROM shopping_items WHERE listId = :listId AND isDeleted = 0 ORDER BY position, updatedAt")
+    fun observeItems(listId: String): Flow<List<ShoppingItemEntity>>
+
+    @Query("SELECT * FROM shopping_items WHERE householdId = :hh AND isDeleted = 0")
+    fun observeAllItems(hh: String): Flow<List<ShoppingItemEntity>>
+
+    @Query("SELECT COALESCE(MAX(position), -1) FROM shopping_items WHERE listId = :listId")
+    suspend fun maxPosition(listId: String): Int
+
+    @Upsert
+    suspend fun upsertItem(e: ShoppingItemEntity)
+}

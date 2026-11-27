@@ -6,6 +6,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.homebudget.domain.model.MemberStatus
 import com.homebudget.domain.model.Role
+import com.homebudget.domain.model.ShoppingStatus
 import com.homebudget.domain.model.TransactionType
 
 /*
@@ -241,4 +242,47 @@ data class ConflictEntity(
     val detectedAt: Long,
     val resolutionStatus: ConflictResolution,
     val resolvedAt: Long? = null,
+)
+
+/** A shared bazar (shopping) list. Synced as its own entity; items are synced separately. */
+@Entity(
+    tableName = "shopping_lists",
+    foreignKeys = [ForeignKey(entity = HouseholdEntity::class, parentColumns = ["id"], childColumns = ["householdId"], onDelete = ForeignKey.CASCADE)],
+    indices = [Index("householdId")],
+)
+data class ShoppingListEntity(
+    @PrimaryKey val id: String,
+    val householdId: String,
+    val title: String,
+    val status: ShoppingStatus,
+    val createdBy: String,
+    val createdAt: Long,
+    val updatedAt: Long,
+    val completedAt: Long?,
+    val revision: Long,
+    val lastOperationId: String,
+    val isDeleted: Boolean = false,
+)
+
+/** One line of a bazar list. Each item is its own synced entity so two phones can edit different items at once. */
+@Entity(
+    tableName = "shopping_items",
+    foreignKeys = [ForeignKey(entity = HouseholdEntity::class, parentColumns = ["id"], childColumns = ["householdId"], onDelete = ForeignKey.CASCADE)],
+    indices = [Index("householdId"), Index("listId")],
+)
+data class ShoppingItemEntity(
+    @PrimaryKey val id: String,
+    val householdId: String,
+    val listId: String,
+    val name: String,
+    val quantity: String?,
+    val categoryId: String,
+    val position: Int,
+    val isChecked: Boolean,
+    val priceMinor: Long?,
+    val checkedBy: String?,
+    val updatedAt: Long,
+    val revision: Long,
+    val lastOperationId: String,
+    val isDeleted: Boolean = false,
 )
