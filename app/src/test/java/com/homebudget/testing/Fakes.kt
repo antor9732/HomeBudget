@@ -192,6 +192,7 @@ class Device(server: FakeDriveServer, email: String, name: String, val time: Fak
     val writer = LocalChangeWriter(db, identity, time, listener)
     val households = HouseholdRepositoryImpl(db, identity, writer, time)
     val finance = FinanceRepositoryImpl(db, households, writer, identity, time)
+    val shopping = com.homebudget.data.repository.ShoppingRepositoryImpl(db, households, finance, writer, time)
     val engine = SyncEngine(db, drive, crypto, keys, identity, time, listener)
     val cloud = HouseholdCloudService(db, drive, crypto, keys, identity, households, engine, time)
     val backup = BackupService(db, drive, crypto, keys, engine, identity, time)
