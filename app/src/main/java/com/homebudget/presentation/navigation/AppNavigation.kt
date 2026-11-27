@@ -7,7 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.BarChart
-import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
@@ -42,6 +42,8 @@ import com.homebudget.core.common.AppPreferences
 import com.homebudget.core.common.ThemeMode
 import com.homebudget.domain.model.TransactionType
 import com.homebudget.domain.repository.HouseholdRepository
+import com.homebudget.presentation.bazar.BazarHomeScreen
+import com.homebudget.presentation.bazar.BazarListScreen
 import com.homebudget.presentation.budget.BudgetScreen
 import com.homebudget.presentation.categories.CategoriesScreen
 import com.homebudget.presentation.common.BaseViewModel
@@ -90,7 +92,7 @@ private data class Tab(val route: String, val label: String, val icon: ImageVect
 private val tabs = listOf(
     Tab("dashboard", "Dashboard", Icons.Filled.Dashboard),
     Tab("transactions", "History", Icons.AutoMirrored.Filled.ReceiptLong),
-    Tab("categories", "Categories", Icons.Filled.Category),
+    Tab("bazar", "Bazar", Icons.Filled.ShoppingCart),
     Tab("reports", "Reports", Icons.Filled.BarChart),
     Tab("settings", "Settings", Icons.Filled.Settings),
 )
@@ -165,13 +167,17 @@ private fun MainNav(canEdit: Boolean) {
                 )
             }
             composable("transactions") { TransactionsScreen(onOpen = { nav.navigate("tx/$it") }) }
-            composable("categories") { CategoriesScreen() }
+            composable("bazar") { BazarHomeScreen(onOpen = { nav.navigate("bazar/$it") }) }
+            composable("bazar/{id}", arguments = listOf(navArgument("id") { type = NavType.StringType })) {
+                BazarListScreen(onBack = { nav.popBackStack() }, onOpenList = { id -> nav.navigate("bazar/$id") { popUpTo("bazar") } })
+            }
+            composable("categories") { CategoriesScreen(onBack = { nav.popBackStack() }) }
             composable("reports") { ReportsScreen() }
             composable("settings") {
                 SettingsScreen(
                     onMembers = { nav.navigate("members") }, onNotifications = { nav.navigate("notifications") }, onSync = { nav.navigate("sync") },
                     onBackup = { nav.navigate("backup") }, onPrivacy = { nav.navigate("privacy") }, onBudget = { nav.navigate("budget") },
-                    onConnectDrive = { nav.navigate("connect") },
+                    onConnectDrive = { nav.navigate("connect") }, onCategories = { nav.navigate("categories") },
                 )
             }
             composable(
