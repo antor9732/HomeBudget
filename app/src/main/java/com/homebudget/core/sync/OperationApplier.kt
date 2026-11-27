@@ -18,6 +18,8 @@ import com.homebudget.data.remote.MemberDto
 import com.homebudget.data.remote.OperationEnvelope
 import com.homebudget.data.remote.SyncJson
 import com.homebudget.data.remote.TransactionDto
+import com.homebudget.data.remote.ShoppingItemDto
+import com.homebudget.data.remote.ShoppingListDto
 
 sealed interface ApplyResult {
     data object Applied : ApplyResult
@@ -92,6 +94,23 @@ class OperationApplier(private val db: AppDatabase, private val nowMillis: () ->
                     if (dto.items.isNotEmpty()) db.transactionItems().insertAll(dto.itemEntities())
                 }
             }
+            EntityType.SHOPPING_LIST -> {
+                val dto = SyncJson.decodeFromString<ShoppingListDto>(env.payload)
+                val existing = db.shopping().getList(dto.id)
+                merge(env, existing?.let { LocalVersion(it.revision, it.lastOperationId, it.isDeleted) }, dto.revision, dto.isDeleted,
+                    currentJson = { null }, recordConflict = false) {
+                    db.shopping().upsertList(dto.toEntity(env.operationId))
+                }
+            }
+            EntityType.SHOPPING_ITEM -> {
+                val dto = SyncJson.decodeFromString<ShoppingItemDto>(env.payload)
+                if (db.shopping().getList(dto.listId) == null) return ApplyResult.Deferred("bazar list ${dto.listId} not yet received")
+                val existing = db.shopping().getItem(dto.id)
+                merge(env, existing?.let { LocalVersion(it.revision, it.lastOperationId, it.isDeleted) }, dto.revision, dto.isDeleted,
+                    currentJson = { null }, recordConflict = false) {
+                    db.shopping().upsertItem(dto.toEntity(env.operationId))
+                }
+            }
         }
         db.sync().insertApplied(AppliedOperationEntity(env.operationId, env.householdId, "REMOTE", env.entityId, env.baseOperationId, driveFileId, nowMillis()))
         db.sync().deleteDeferred(env.operationId)
@@ -104,12 +123,14 @@ class OperationApplier(private val db: AppDatabase, private val nowMillis: () ->
         incomingRevision: Long,
         incomingDeleted: Boolean,
         currentJson: suspend () -> String?,
+        /** Bazar lists resolve concurrent edits silently (the newer version wins); nothing is shown in Sync center. */
+        recordConflict: Boolean = true,
         write: suspend () -> Unit,
     ): ApplyResult {
         val incoming = IncomingVersion(incomingRevision, env.operationId, env.baseOperationId, incomingDeleted)
         val ancestor = local != null && isAncestor(env.operationId, local.operationId)
         val decision = MergePolicy.decide(local, incoming, ancestor)
-        if (decision.conflict && local != null) {
+        if (decision.conflict && local != null && recordConflict) {
             val current = currentJson() ?: "{}"
             val keptIsIncoming = decision.apply
             db.conflicts().insert(
@@ -129,7 +150,7 @@ class OperationApplier(private val db: AppDatabase, private val nowMillis: () ->
         }
         if (decision.apply) write()
         return when {
-            decision.conflict -> ApplyResult.Conflict(decision.apply)
+            decision.conflict && recordConflict -> ApplyResult.Conflict(decision.apply)
             decision.apply -> ApplyResult.Applied
             else -> ApplyResult.Ignored
         }

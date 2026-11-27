@@ -12,6 +12,9 @@ import com.homebudget.data.remote.TransactionDto
 import com.homebudget.data.remote.BudgetDto
 import com.homebudget.data.remote.CategoryDto
 import com.homebudget.data.remote.HouseholdDto
+import com.homebudget.data.remote.ShoppingItemDto
+import com.homebudget.data.remote.ShoppingListDto
+import com.homebudget.domain.model.ShoppingStatus
 import com.homebudget.domain.model.MemberStatus
 import com.homebudget.domain.model.Role
 
@@ -52,6 +55,14 @@ object OperationAuthorizer {
                         check(it.items.size <= 200 && it.items.all { i -> i.amountMinor > 0 && i.name.isNotBlank() })
                         check(it.items.sumOf { i -> i.amountMinor } == it.amountMinor)
                     }
+                }
+                EntityType.SHOPPING_LIST -> SyncJson.decodeFromString<ShoppingListDto>(env.payload).let {
+                    check(it.id == env.entityId && it.householdId == env.householdId && it.title.isNotBlank() && it.title.length <= 80)
+                    ShoppingStatus.valueOf(it.status)
+                }
+                EntityType.SHOPPING_ITEM -> SyncJson.decodeFromString<ShoppingItemDto>(env.payload).let {
+                    check(it.id == env.entityId && it.householdId == env.householdId && it.name.isNotBlank() && it.name.length <= 60)
+                    check((it.quantity?.length ?: 0) <= 30 && it.position >= 0 && (it.priceMinor == null || it.priceMinor >= 0))
                 }
             }
             null
@@ -103,6 +114,9 @@ object OperationAuthorizer {
                 }
                 else -> AuthDecision.Rejected("viewer cannot change transactions")
             }
+            // Bazar lists are shared work: anyone who can add transactions may edit any list or item.
+            EntityType.SHOPPING_LIST, EntityType.SHOPPING_ITEM ->
+                if (member.role.canEditTransactions) AuthDecision.Allowed else AuthDecision.Rejected("viewer cannot change bazar lists")
         }
     }
 

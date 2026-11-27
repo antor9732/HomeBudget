@@ -134,6 +134,8 @@ class SyncRepositoryImpl @Inject constructor(
             EntityType.CATEGORY -> SyncJson.decodeFromString<CategoryDto>(json).let { "${it.name}${if (it.isActive) "" else " (archived)"}" }
             EntityType.MEMBER -> SyncJson.decodeFromString<MemberDto>(json).let { "${it.displayName}: ${it.role} ${it.status}" }
             EntityType.HOUSEHOLD -> "Household settings"
+            EntityType.SHOPPING_LIST -> "Bazar list"
+            EntityType.SHOPPING_ITEM -> "Bazar list item"
         }
     }.getOrDefault("Unreadable version")
 }

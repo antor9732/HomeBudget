@@ -87,6 +87,8 @@ class BackupService @Inject constructor(
                 execSQL("DELETE FROM opening_balances WHERE householdId = ?", arrayOf(hh))
                 execSQL("DELETE FROM categories WHERE householdId = ?", arrayOf(hh))
                 execSQL("DELETE FROM members WHERE householdId = ?", arrayOf(hh))
+                execSQL("DELETE FROM shopping_items WHERE householdId = ?", arrayOf(hh))
+                execSQL("DELETE FROM shopping_lists WHERE householdId = ?", arrayOf(hh))
             }
             db.households().upsert(
                 HouseholdEntity(hh, household.name, household.ownerMemberId, household.currencyCode, household.driveFolderId,
