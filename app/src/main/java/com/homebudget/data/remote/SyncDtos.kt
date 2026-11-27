@@ -6,7 +6,7 @@ import kotlinx.serialization.json.Json
 const val SCHEMA_VERSION = 1
 
 enum class EntityType(val applyOrder: Int) {
-    HOUSEHOLD(0), MEMBER(1), CATEGORY(2), BUDGET(3), OPENING_BALANCE(4), TRANSACTION(5)
+    HOUSEHOLD(0), MEMBER(1), CATEGORY(2), BUDGET(3), OPENING_BALANCE(4), TRANSACTION(5), SHOPPING_LIST(6), SHOPPING_ITEM(7)
 }
 
 enum class OperationType { CREATE, UPDATE, DELETE }
@@ -56,6 +56,19 @@ data class TransactionDto(
     val isDeleted: Boolean = false,
     /** Optional line items; when present, amountMinor == sum of item amounts. Older apps ignore it. */
     val items: List<TransactionItemDto> = emptyList(),
+)
+
+@Serializable
+data class ShoppingListDto(
+    val id: String, val householdId: String, val title: String, val status: String, val createdBy: String,
+    val createdAt: Long, val updatedAt: Long, val completedAt: Long? = null, val revision: Long, val isDeleted: Boolean = false,
+)
+
+@Serializable
+data class ShoppingItemDto(
+    val id: String, val householdId: String, val listId: String, val name: String, val quantity: String? = null,
+    val categoryId: String, val position: Int, val isChecked: Boolean, val priceMinor: Long? = null, val checkedBy: String? = null,
+    val updatedAt: Long, val revision: Long, val isDeleted: Boolean = false,
 )
 
 /** Decrypted logical operation (matches the envelope in the plan, Section 9). */
