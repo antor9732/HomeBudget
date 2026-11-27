@@ -18,5 +18,9 @@ object Ids {
     fun defaultCategory(householdId: String, key: String): String =
         nameUuid("category:$householdId:default:$key")
 
+    /** The expense created from a bazar list for one category; the same on every phone, so finishing twice cannot double-count. */
+    fun bazarExpense(listId: String, categoryId: String): String =
+        nameUuid("bazar-expense:$listId:$categoryId")
+
     private fun nameUuid(s: String): String = UUID.nameUUIDFromBytes(s.toByteArray(Charsets.UTF_8)).toString()
 }
