@@ -21,6 +21,7 @@ import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.CloudSync
+import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Login
@@ -55,6 +56,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -121,7 +123,7 @@ class SettingsViewModel @Inject constructor(
 @Composable
 fun SettingsScreen(
     onMembers: () -> Unit, onNotifications: () -> Unit, onSync: () -> Unit, onBackup: () -> Unit,
-    onPrivacy: () -> Unit, onBudget: () -> Unit, onConnectDrive: () -> Unit,
+    onPrivacy: () -> Unit, onBudget: () -> Unit, onConnectDrive: () -> Unit, onCategories: () -> Unit = {},
     vm: SettingsViewModel = hiltViewModel(), account: AccountViewModel = hiltViewModel(),
 ) {
     val activity = LocalContext.current as android.app.Activity
@@ -134,7 +136,7 @@ fun SettingsScreen(
     val (ctx, sync, session) = state ?: return
     Column(Modifier.fillMaxSize()) {
         Text("Settings", style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(16.dp, 8.dp))
-        LazyColumn(contentPadding = PaddingValues(16.dp, 0.dp, 16.dp, 96.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        LazyColumn(Modifier.testTag("settings_list"), contentPadding = PaddingValues(16.dp, 0.dp, 16.dp, 96.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item {
                 SectionCard(title = "Household") {
                     LabeledRow("Name") { Text(ctx.household.name) }
@@ -143,6 +145,7 @@ fun SettingsScreen(
                     if (ctx.role == Role.OWNER && !ctx.readOnly) SettingsRow(Icons.Filled.Edit, "Rename household") { renaming = true }
                     SettingsRow(Icons.Filled.Group, "Members", "Invite family, roles and access") { onMembers() }
                     SettingsRow(Icons.Filled.AccountBalanceWallet, "Monthly budget & opening balance") { onBudget() }
+                    SettingsRow(Icons.Filled.Category, "Categories", "Expense and income categories") { onCategories() }
                 }
             }
             item {
