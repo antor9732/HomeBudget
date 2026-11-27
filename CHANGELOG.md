@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.0 — 2026-11-27
+- New **Bazar** tab: shared shopping lists. Write items (with optional quantity and category) at home; at the market tick each item and enter its price; "Finish bazar" adds one itemized expense per category for today and can move unbought items to a new list.
+- Lists and items sync to every phone in the household (new synced entity types SHOPPING_LIST and SHOPPING_ITEM; viewers are read-only). Finishing the same list on two phones cannot double-count (deterministic expense ids).
+- Categories moved to Settings → Categories.
+- Room v3 migration; operations an older version could not read are read again after updating.
+
 ## 1.3.2 — 2026-11-19
 - Official release build: smaller APK (about 14 MB), signed with the official release key. SHA-256 of the APK is listed in the release notes.
 - Upgrading from 1.3.1: one-time reinstall needed. On the phone, sync first, then uninstall 1.3.1 and install 1.3.2 (data comes back from Google Drive on sign-in).
