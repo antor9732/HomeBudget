@@ -22,6 +22,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.Unarchive
@@ -93,7 +94,7 @@ class CategoriesViewModel @Inject constructor(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CategoriesScreen(vm: CategoriesViewModel = hiltViewModel()) {
+fun CategoriesScreen(onBack: (() -> Unit)? = null, vm: CategoriesViewModel = hiltViewModel()) {
     val state by vm.state.collectAsStateWithLifecycle()
     val (ctx, cats) = state ?: return
     val host = remember { SnackbarHostState() }
@@ -104,7 +105,12 @@ fun CategoriesScreen(vm: CategoriesViewModel = hiltViewModel()) {
     val type = if (tab == 0) TransactionType.EXPENSE else TransactionType.INCOME
     Box(Modifier.fillMaxSize()) {
         Column {
-            Text("Categories", style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(16.dp, 8.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (onBack != null) androidx.compose.material3.IconButton(onClick = onBack, modifier = Modifier.padding(start = 4.dp)) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                }
+                Text("Categories", style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(if (onBack != null) 4.dp else 16.dp, 8.dp))
+            }
             PrimaryTabRow(selectedTabIndex = tab) {
                 Tab(tab == 0, { tab = 0 }, text = { Text("Expense") })
                 Tab(tab == 1, { tab = 1 }, text = { Text("Income") })
